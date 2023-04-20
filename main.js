@@ -16,7 +16,7 @@ let themaLayer ={
     stops: L.featureGroup(),
     lines: L.featureGroup(),
     zones: L.featureGroup(),
-    sights: L.featureGroup()
+    sights: L.featureGroup().addTo(map)
 }
 
 // Hintergrundlayer
@@ -32,7 +32,7 @@ let layerControl = L.control.layers({
     "Vienna Sightseeing Haltestellen": themaLayer.stops,
     "Vienna Sightseeing Linien": themaLayer.lines,
     "Fußgängerzonen": themaLayer. zones,
-    "Sehenswürdigkeiten": themaLayer. zones
+    "Sehenswürdigkeiten": themaLayer. sights
 }).addTo(map);
 
 // Maßstab
@@ -46,15 +46,25 @@ async function showStops (url) {
     let jsondata = await response.json();
     L.geoJSON(jsondata).addTo(themaLayer.stops);
 }
-async function showSights (url) {
-    let response = await fetch(url);
-    let jsondata = await response.json();
-    L.geoJSON(jsondata).addTo(themaLayer.sights);
-}
 async function showLines (url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata).addTo(themaLayer.lines);
+}
+async function showSights (url) {
+    let response = await fetch(url);
+    let jsondata = await response.json();
+    L.geoJSON(jsondata,{
+        onEachFeature: function(feature, layer){
+            let prop = feature.properties;
+            layer.bindPopup(`
+            <img src="${prop.THUMBNAIL}" alt="*">
+            <h4><a href="${prop.WEITERE_INF}" target="Wien">${prop.NAME}</a></h4> 
+            <adress>${prop.ADRESSE}</adress>
+            `);
+            console.log(feature.properties, prop.NAME);
+        }
+    }).addTo(themaLayer.sights);
 }
 async function showZones (url) {
     let response = await fetch(url);
