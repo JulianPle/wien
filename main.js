@@ -44,22 +44,22 @@ L.control.scale({
 async function showStops (url) {
     let response = await fetch(url);
     let jsondata = await response.json();
-    L.geoJSON(jsondata).addTo(map);
+    L.geoJSON(jsondata).addTo(themaLayer.stops);
 }
 async function showSights (url) {
     let response = await fetch(url);
     let jsondata = await response.json();
-    L.geoJSON(jsondata).addTo(map);
+    L.geoJSON(jsondata).addTo(themaLayer.sights);
 }
 async function showLines (url) {
     let response = await fetch(url);
     let jsondata = await response.json();
-    L.geoJSON(jsondata).addTo(map);
+    L.geoJSON(jsondata).addTo(themaLayer.lines);
 }
 async function showZones (url) {
     let response = await fetch(url);
     let jsondata = await response.json();
-    L.geoJSON(jsondata).addTo(map);
+    L.geoJSON(jsondata).addTo(themaLayer.zones);
 }
 
 showStops("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:TOURISTIKHTSVSLOGD&srsName=EPSG:4326&outputFormat=json");
