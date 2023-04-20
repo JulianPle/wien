@@ -11,6 +11,13 @@ let stephansdom = {
 let map = L.map("map").setView([
     stephansdom.lat, stephansdom.lng
 ], 12);
+//thematische Layer
+let themaLayer ={
+    stops: L.featureGroup(),
+    lines: L.featureGroup(),
+    zones: L.featureGroup(),
+    sights: L.featureGroup()
+}
 
 // Hintergrundlayer
 let layerControl = L.control.layers({
@@ -21,19 +28,19 @@ let layerControl = L.control.layers({
     "BasemapAT Oberfläche": L.tileLayer.provider("BasemapAT.surface"),
     "BasemapAT Orthofoto": L.tileLayer.provider("BasemapAT.orthofoto"),
     "BasemapAT Beschriftung": L.tileLayer.provider("BasemapAT.overlay")
+}, {
+    "Vienna Sightseeing Haltestellen": themaLayer.stops,
+    "Vienna Sightseeing Linien": themaLayer.lines,
+    "Fußgängerzonen": themaLayer. zones,
+    "Sehenswürdigkeiten": themaLayer. zones
 }).addTo(map);
-
-// Marker Stephansdom
-L.marker([
-    stephansdom.lat, stephansdom.lng
-]).addTo(map).bindPopup(stephansdom.title).openPopup();
 
 // Maßstab
 L.control.scale({
     imperial: false,
 }).addTo(map);
 
-//Vienna Sightseeing Haltestellen
+//Vienna Sightseeing: Haltestellen, Sights, Linien, Fußgängerzonen
 async function showStops (url) {
     let response = await fetch(url);
     let jsondata = await response.json();
