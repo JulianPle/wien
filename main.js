@@ -49,7 +49,7 @@ async function showStops(url) {
             let prop = feature.properties;
             layer.bindPopup(`
             <h4><i class="fa-solid fa-bus"></i>&nbsp;${prop.LINE_NAME}</h4>
-            ${prop.STAT_NAME}
+            <i class="fa-regular fa-circle-stop"></i>&nbsp;${prop.STAT_NAME}
             `);
             //console.log(feature.properties);
         }
