@@ -10,13 +10,13 @@ let stephansdom = {
 // Karte initialisieren
 let map = L.map("map").setView([
     stephansdom.lat, stephansdom.lng
-], 12);
+], 15);
 //thematische Layer
 let themaLayer = {
     stops: L.featureGroup(),
-    lines: L.featureGroup(),
+    lines: L.featureGroup(). addTo(map),
     zones: L.featureGroup(),
-    sights: L.featureGroup().addTo(map)
+    sights: L.featureGroup()
 }
 
 // Hintergrundlayer
@@ -58,7 +58,25 @@ async function showStops(url) {
 async function showLines(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
+    let lineNames = {};
+    let lineColors = { 
+        "1": "#FF4136", //red
+        "2": "#FFDC00", //yellow
+        "3": "#0074D9", //blue
+        "4": "#2ECC40", //green
+        "5": "#AAAAAA", //grey
+        "6": "#FF851B", //orange
+
+    }
+
     L.geoJSON(jsondata, {
+        style: function (feature) {
+        return {
+            color: lineColors[feature.properties.LINE_ID],
+            weight:3,
+            dashArray: [10, 6]};
+    },
+
         onEachFeature: function (feature, layer) {
             let prop = feature.properties;
             layer.bindPopup(`
@@ -67,7 +85,8 @@ async function showLines(url) {
             <i class="fa-solid fa-arrow-down"></i><br>
             <i class="fa-regular fa-circle-stop"></i>&nbsp;${prop.TO_NAME}
             `);
-            //console.log(feature.properties);
+            lineNames[prop.LINE_ID] = prop.LINE_NAME;
+            console.log(lineNames)
         }
     }).addTo(themaLayer.lines);
 }
@@ -86,10 +105,19 @@ async function showSights(url) {
         }
     }).addTo(themaLayer.sights);
 }
-async function showZones(url) {
+async function showZones(url) {//Fußgängerzonen
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
+        style: function (feature) {
+        return {
+            color: "#F012BE",
+            opacity: 0.4,
+            weight: 1,
+            fillOpacity: 0.1
+            };
+        },
+
         onEachFeature: function (feature, layer) {
             let prop = feature.properties;
             layer.bindPopup(`
