@@ -11,14 +11,15 @@ let stephansdom = {
 let map = L.map("map").setView([
     stephansdom.lat, stephansdom.lng
 ], 15);
-map.addControl(new L.Control.Fullscreen ())
+map.addControl(new L.Control.Fullscreen())
 
 //thematische Layer
 let themaLayer = {
     stops: L.featureGroup(),
     lines: L.featureGroup(),
     zones: L.featureGroup(),
-    sights: L.featureGroup(). addTo(map),
+    sights: L.featureGroup(),
+    hotels: L.featureGroup().addTo(map),
 }
 
 // Hintergrundlayer
@@ -34,7 +35,8 @@ let layerControl = L.control.layers({
     "Vienna Sightseeing Haltestellen": themaLayer.stops,
     "Vienna Sightseeing Linien": themaLayer.lines,
     "Fußgängerzonen": themaLayer.zones,
-    "Sehenswürdigkeiten": themaLayer.sights
+    "Sehenswürdigkeiten": themaLayer.sights,
+    "Hotels": themaLayer.hotels
 }).addTo(map);
 
 // Maßstab
@@ -47,16 +49,17 @@ async function showStops(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
-        pointToLayer: function(feature, latlng) {
+        pointToLayer: function (feature, latlng) {
+            //console.log(feature.properties);
             return L.marker(latlng, {
-                    icon: L.icon({
-                        iconUrl: 'icons/bus.png',
-                        iconSize: [32, 37],
-                        iconAnchor: [16, 37], //Positionierung vom Icon
-                        popupAnchor: [0, -37], //popup versetzen
-                        })
-                });
-            },
+                icon: L.icon({
+                    iconUrl: `icons/bus_${feature.properties.LINE_ID}.png`,
+                    iconSize: [32, 37],
+                    iconAnchor: [16, 37], //Positionierung vom Icon
+                    popupAnchor: [0, -37], //popup versetzen
+                })
+            });
+        },
         onEachFeature: function (feature, layer) {
             let prop = feature.properties;
             layer.bindPopup(`
@@ -68,7 +71,7 @@ async function showStops(url) {
     }).addTo(themaLayer.stops);
 }
 //Linien
-async function showLines(url) { 
+async function showLines(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     let lineNames = {};
@@ -82,11 +85,12 @@ async function showLines(url) {
     }
     L.geoJSON(jsondata, {
         style: function (feature) {
-        return {
-            color: lineColors[feature.properties.LINE_ID],
-            weight:3,
-            dashArray: [10, 6]};
-    },
+            return {
+                color: lineColors[feature.properties.LINE_ID],
+                weight: 3,
+                dashArray: [10, 6]
+            };
+        },
         onEachFeature: function (feature, layer) {
             let prop = feature.properties;
             layer.bindPopup(`
@@ -101,17 +105,17 @@ async function showLines(url) {
     }).addTo(themaLayer.lines);
 }
 //Sehenswürdigkeiten
-async function showSights(url) { 
+async function showSights(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
-        pointToLayer: function(feature, latlng) {
+        pointToLayer: function (feature, latlng) {
             return L.marker(latlng, {
-                    icon: L.icon({
-                        iconUrl: 'icons/photo1.png',
-                        iconSize: [32, 37],
-                        iconAnchor: [16, 37], //Positionierung vom Icon
-                        popupAnchor: [0, -37], //popup versetzen
+                icon: L.icon({
+                    iconUrl: 'icons/photo1.png',
+                    iconSize: [32, 37],
+                    iconAnchor: [16, 37], //Positionierung vom Icon
+                    popupAnchor: [0, -37], //popup versetzen
                 })
             });
         },
@@ -127,16 +131,16 @@ async function showSights(url) {
     }).addTo(themaLayer.sights);
 }
 //Fußgängerzonen
-async function showZones(url) { 
+async function showZones(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
         style: function (feature) {
-        return {
-            color: "#F012BE",
-            opacity: 0.4,
-            weight: 1,
-            fillOpacity: 0.1
+            return {
+                color: "#F012BE",
+                opacity: 0.4,
+                weight: 1,
+                fillOpacity: 0.1
             };
         },
         onEachFeature: function (feature, layer) {
@@ -150,8 +154,38 @@ async function showZones(url) {
         }
     }).addTo(themaLayer.zones);
 }
-
+//Hotels
+async function showHotels(url) {
+    let response = await fetch(url);
+    let jsondata = await response.json();
+    L.geoJSON(jsondata, {
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, {
+                icon: L.icon({
+                    iconUrl: 'icons/hotel.png',
+                    iconSize: [32, 37],
+                    iconAnchor: [16, 37], //Positionierung vom Icon
+                    popupAnchor: [0, -37], //popup versetzen
+                })
+            });
+        },
+        onEachFeature: function (feature, layer) {
+            let prop = feature.properties;
+            layer.bindPopup(`
+            <h3> ${prop.BETRIEB}</h3> 
+            <h4> ${prop.BETRIEBSART_TXT} ${prop.KATEGORIE_TXT}</h4> 
+            <hr>
+            Adresse:&nbsp;${prop.ADRESSE}<br>
+            Tel.:&nbsp;<a href="tel:${prop.KONTAKT_TEL}">${prop.KONTAKT_TEL}</a><br>
+            E-mail:&nbsp;<a href="mailto:${prop.KONTAKT_EMAIL}" target="Wien">${prop.KONTAKT_EMAIL}</a><br>
+            Web:&nbsp;<a href="${prop.WEBLINK1}" target="Wien">${prop.WEBLINK1}</a><br>
+            `);
+            //console.log(feature.properties);
+        }
+    }).addTo(themaLayer.hotels);
+}
 showStops("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:TOURISTIKHTSVSLOGD&srsName=EPSG:4326&outputFormat=json");
 showLines("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:TOURISTIKLINIEVSLOGD&srsName=EPSG:4326&outputFormat=json");
 showZones("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:FUSSGEHERZONEOGD&srsName=EPSG:4326&outputFormat=json");
 showSights("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:SEHENSWUERDIGOGD&srsName=EPSG:4326&outputFormat=json");
+showHotels("https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:UNTERKUNFTOGD&srsName=EPSG:4326&outputFormat=json");
