@@ -47,6 +47,16 @@ async function showStops(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {
+                    icon: L.icon({
+                        iconUrl: 'icons/bus.png',
+                        iconSize: [32, 37],
+                        iconAnchor: [16, 37], //Positionierung vom Icon
+                        popupAnchor: [0, -37], //popup versetzen
+                        })
+                });
+            },
         onEachFeature: function (feature, layer) {
             let prop = feature.properties;
             layer.bindPopup(`
@@ -62,7 +72,7 @@ async function showLines(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     let lineNames = {};
-    let lineColors = { 
+    let lineColors = { //http://clrs.cc
         "1": "#FF4136", //red
         "2": "#FFDC00", //yellow
         "3": "#0074D9", //blue
