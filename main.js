@@ -94,8 +94,8 @@ async function showZones(url) {
             let prop = feature.properties;
             layer.bindPopup(`
             <h4>Fußgängerzone&nbsp;${prop.ADRESSE}</h4>
-            <i class="fa-regular fa-clock"></i>&nbsp;${prop.ZEITRAUM}<br><br>
-            <i class="fa-solid fa-circle-info"></i>&nbsp;${prop.AUSN_TEXT}
+            <i class="fa-regular fa-clock"></i>&nbsp;${prop.ZEITRAUM || "dauerhaft"}<br><br>
+            <i class="fa-solid fa-circle-info"></i>&nbsp;${prop.AUSN_TEXT || "keine Ausnahmen"}
             `);
             //console.log(feature.properties);
         }
