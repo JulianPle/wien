@@ -95,6 +95,16 @@ async function showSights(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {
+                    icon: L.icon({
+                        iconUrl: 'icons/photo1.png',
+                        iconSize: [32, 37],
+                        iconAnchor: [16, 37], //Positionierung vom Icon
+                        popupAnchor: [0, -37], //popup versetzen
+                })
+            });
+        },
         onEachFeature: function (feature, layer) {
             let prop = feature.properties;
             layer.bindPopup(`
