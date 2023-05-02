@@ -160,13 +160,35 @@ async function showHotels(url) {
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
         pointToLayer: function (feature, latlng) {
+
+
+            if (feature.properties.KATEGORIE_TXT == "nicht kategorisiert") {
+                icon = "icons/hotel_0star.png"
+            }
+            else if (feature.properties.KATEGORIE_TXT == "1*") {
+                icon = "icons/hotel_1star.png"
+            }
+            else if (feature.properties.KATEGORIE_TXT == "2*") {
+                icon = "icons/hotel_2stars.png"
+            }
+            else if (feature.properties.KATEGORIE_TXT == "3*") {
+                icon = "icons/hotel_3stars.png"
+            }
+            else if (feature.properties.KATEGORIE_TXT == "4*") {
+                icon = "icons/hotel_4stars.png"
+            }
+            else if (feature.properties.KATEGORIE_TXT == "5*") {
+                icon = "icons/hotel_5stars.png"
+            }
+
             return L.marker(latlng, {
                 icon: L.icon({
-                    iconUrl: 'icons/hotel.png',
+                    iconUrl: icon,
                     iconSize: [32, 37],
                     iconAnchor: [16, 37], //Positionierung vom Icon
                     popupAnchor: [0, -37], //popup versetzen
                 })
+
             });
         },
         onEachFeature: function (feature, layer) {
@@ -180,7 +202,10 @@ async function showHotels(url) {
             E-mail:&nbsp;<a href="mailto:${prop.KONTAKT_EMAIL}" target="Wien">${prop.KONTAKT_EMAIL}</a><br>
             Web:&nbsp;<a href="${prop.WEBLINK1}" target="Wien">${prop.WEBLINK1}</a><br>
             `);
-            //console.log(feature.properties);
+
+            console.log(feature.properties);
+
+
         }
     }).addTo(themaLayer.hotels);
 }
